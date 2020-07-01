@@ -1,0 +1,52 @@
+<% include partials/header %>
+
+    <div class="container">
+
+        <h1>Classes page</h1>
+
+        <% for(var i = 0; i < classes.length; i++) { %>
+
+            <div class="classShowcase">
+                <p><b>Class name:</b> <i><%= classes[i].name %></i></p>
+
+                <% if(classes[i].students !== undefined){ %>
+                    <p><b>Number of students: </b> <i><%= classes[i].students.length %></i></p>
+                <% } else { %>
+                    <p><b>Number of students: </b> <i>0</i></p>
+                <% } %>
+
+                <% var studentsWithoutGroup = 0 %>
+                <% classes[i].students.forEach(student => { %>
+                    
+                    <% if(users.filter(user => user.id === student.id)[0].groupID === undefined){ %>
+                        <% studentsWithoutGroup += 1 %>
+                    <% } %>
+                <% }) %>
+
+                <% if(studentsWithoutGroup > 0){ %>
+                    <p><b>Number of students without groups: </b> <i><%= studentsWithoutGroup %></i>
+                <% } %>
+
+                <% if(classes[i].groups.length !== 0){ %>
+                    <p><b>Number of groups: </b> <i><%= classes[i].groups.length %></i> &nbsp;&nbsp;&nbsp; <button onclick="window.location.href='/classes/<%= classes[i].id %>/groups'">Group overview</button></p>
+                <% } else { %>
+                    <p><b>Number of groups: </b> <i>0</i></p>
+                <% } %>
+
+                <button onclick="window.location.href='/classes/<%= classes[i].id %>'">Go to class details</button>
+
+                <button onclick="window.location.href='/classes/<%= classes[i].id %>/edit'">Update class</button><br><br>
+                
+
+                <form action="/classes/<%= classes[i].id %>?_method=DELETE" method="POST">
+                    <button>Delete class</button>
+                </form> <br> <br>
+                
+        <% } %>
+
+        <br><br> <button onclick="window.location.href='/classes/create'">Create a new class</button><br><br><br>
+
+        <button onclick="window.location.href='/users/<%= thisUser.id %>'">Click me to go back to user</button>
+    </div>
+
+<% include partials/footer %>

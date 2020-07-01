@@ -1,0 +1,20 @@
+<% include ./partials/header %>
+
+<h1>Sign up!</h1>
+
+<form action="/register" method="POST">
+
+    <% classes.forEach(thisClass => { %>
+        <input type="radio" name="class" value="<%= thisClass.id %>"> <%= thisClass.name %> <br>
+    <% }) %>
+    <input type="password" name="classPass" id="classPass" placeholder="Class password"><br><br>
+
+    <input type="text" name="firstName" placeholder="First Name"> <br>
+    <input type="text" name="lastName" placeholder="Last Name"> <br>
+    <input type="email" name="email" placeholder="yourmail@email.come"> <br>
+    <input type="password" name="password" placeholder="password"> <br>
+    <button>Sign Up</button>
+    
+</form>
+
+<% include ./partials/footer %>

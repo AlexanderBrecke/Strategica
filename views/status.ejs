@@ -1,0 +1,74 @@
+<% include partials/header %>
+
+
+<% if(!thisUser.isAdmin) { %>
+    <h1>Status page!</h1> <br>
+
+    <% thisGroup = groups.filter(group => group.id === thisUser.groupID)[0] %>
+    
+    <% if(thisGroup.assignmentAnswers !== undefined){ %>
+        <% thisGroup.assignmentAnswers.forEach(answer => { %>
+            <% if(answer.isCorrected){ %>
+                <div class="statusSummary">
+                    <p><b>Level: <%= assignments.filter(assignment => assignment.id === answer.id)[0].level %></b></p>
+                    <p>Assessment from other group:</p>
+                    <p><i><%= answer.assessment %></i></p>
+                    <% if(!answer.assessedByAdmin){ %>
+                        <p>Score: <i><%= String(answer.score) %></i></p>
+                    <% } %>
+                    <% if(answer.accepted === undefined && answer.declined === undefined || !answer.accepted && !answer.declined) { %>
+                        <button onclick="window.location.href='/status/<%= thisGroup.id %>/details/<%= answer.id %>'">Go to details</button>
+                    <% } else if(answer.accepted) { %>
+                        <p>Answer has been accepted. </p> 
+                        <button onclick="window.location.href='/status/<%= thisGroup.id %>/details/<%= answer.id %>'">Go to details</button>
+                    <% } else if(answer.declined && !answer.assessedByAdmin) { %>
+                        <p>Answer has been declined. Waiting for administrator to assess..</p>
+                    <% } else if(!answer.accepted && answer.assessedByAdmin){ %>
+                        <p>Admin's score: <i><%= String(answer.adminScore) %></i></p>
+                        <p>Answer has been assessed by administrator.</p>
+                        <button onclick="window.location.href='/status/<%= thisGroup.id %>/details/<%= answer.id %>'">Go to details</button>
+                    <% } %>
+                </div> <br> <br>
+            <% } else { %>
+                <div class="waitingForCorrection">
+                    <p><b>level: <%= assignments.filter(assignment => assignment.id === answer.id)[0].level %></b></p>
+                    <p>Waiting for correction..</p>
+                </div>
+            <% } %>
+        <% }) %>
+        <button onclick="window.location.href='/groups/<%= thisGroup.id %>'">Go to group</button>
+    <% } %>
+
+<% } else { %>
+    <h1>Declined crorrections</h1>
+
+    <% thisUser.declinedAssignments.forEach(declined => { %>
+        <% var currentGroup = groups.filter(group => group.id === declined.groupID)[0] %>
+        <% var assignment = assignments.filter(assignment => assignment.id === declined.id)[0] %>
+        <% var declinedAssignment = currentGroup.assignmentAnswers.filter(assignment => assignment.id === assignment.id)[0] %>
+
+        <div class="statusSummary">
+            <div class="groupInfo">
+                <% if(currentGroup.avatar.name !== "Húan Hu"){ %>
+                    <img src="/images/<%= currentGroup.avatar.name %>.png">
+                <% } else { %>
+                    <img src="/images/HuanHu.png">
+                <% } %>
+                <p><b>Declining group: <%= currentGroup.avatar.name %></b></p>
+                <p>Group's class: <i><%= classes.filter(thisClass => thisClass.id === currentGroup.classID)[0].name %></i></p>
+                <p><b>Description:</b> <i><%= currentGroup.avatar.description %></i></p>
+            </div>
+            <p><b>Level: <%= assignments.filter(assignment => assignment.id === declined.id)[0].level %></b></p>
+            <p>Assessment from correcting group:</p>
+            <p><i><%= declinedAssignment.assessment %></i></p>
+            <p>Score: <i><%= String(declinedAssignment.score) %></i></p>
+
+            <button onclick="window.location.href='/admin/declined/<%= declined.id %>/<%= declined.groupID %>'">Go to details</button> <br><br>
+
+            
+        </div>
+        <% }) %>
+        <button onclick="window.location.href='/users/<%= thisUser.id %>'">Go to user</button>
+<% } %>
+
+<% include partials/footer %>

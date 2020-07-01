@@ -1,0 +1,134 @@
+<% include partials/header %>
+
+    <div class="container">
+
+        <% if(thisUser.isAdmin){ %>
+            <h1>Group overview for class: <%= currentClass.name %></h1>
+            
+            <% currentClass.groups.forEach(groupID => { %>
+                <% var thisGroup = groups.filter(group => group.id === groupID.id)[0] %>
+                
+                <div class="groupInfo">
+                    <% if(thisGroup.avatar.name !== "Húan Hu"){ %>
+                        <img src="/images/<%= thisGroup.avatar.name %>.png">
+                    <% } else { %>
+                        <img src="/images/HuanHu.png">
+                    <% } %>
+                    <p><b>Name: <%= thisGroup.avatar.name %></b></p>
+                    <p><b>Description:</b> <i><%= thisGroup.avatar.description %></i></p>
+                </div>
+
+                <ul>
+                    <b>Members:</b>
+                    <% thisGroup.memberIDs.forEach(member => { %>
+
+                        <% var thisStudent = users.filter(user => user.id ===member.id)[0]%>
+                        
+                        <li>
+                            <%= thisStudent.lastName %>, <%= thisStudent.firstName %> 
+                            <% if(thisStudent.groupID !== thisGroup.id){ %>
+                                invite pending..
+                            <% } %>
+                        </li>
+                    <% }) %>
+                </ul>
+
+                <% var totalScore = 0 %>
+                <% thisGroup.assignmentAnswers.forEach(answer => { %>
+                    <% if(answer.assessedByAdmin && answer.adminScore !== undefined){ %>
+                        <% totalScore += answer.adminScore %>
+                    <% } else if(answer.accepted) { %>
+                        <% totalScore += answer.score %> 
+                    <% } %>
+                <% }) %>
+                <% if(thisGroup.score !== undefined){ %>
+                    <% totalScore += thisGroup.score %>
+                <% } %>
+                <% if(totalScore !== 0){ %>
+                    <p><b>Group score: </b> <i><%= totalScore %></i></p>
+                <% } else { %>
+                    <p><b>Group score: </b> <i>0</i></p>
+                <% } %>
+
+                <% if(thisGroup.assignmentAnswers !== undefined){ %>
+                    <p><b>Assignments answered:</b> <i><%= thisGroup.assignmentAnswers.length %></i></p>
+                <% } else { %>
+                    <p><b>Assignments answered: </b> <i>0</i></p>
+                <% } %>
+
+                <button onclick="window.location.href='/admin/groups/<%= thisGroup.id %>'">Group details</button><br><br>
+                
+                <% }) %>
+                <br><button onclick="window.location.href='/users/<%= thisUser.id %>'">Go to user</button><br><br>
+            
+        <% } else { %>
+
+            <h1>Group profile</h1>
+            
+            <% var thisGroup = groups.filter(group => group.id === thisUser.groupID)[0] %>
+                <div class="groupInfo">
+                    <% if(thisGroup.avatar.name !== "Húan Hu"){ %>
+                        <img src="/images/<%= thisGroup.avatar.name %>.png">
+                    <% } else { %>
+                        <img src="/images/HuanHu.png">
+                    <% } %>
+                    <p><b>Name: <%= thisGroup.avatar.name %></b></p>
+                    <p><b>Description:</b> <i><%= thisGroup.avatar.description %></i></p>
+                </div>
+                <p><b>Users:</b></p>
+                <% thisGroup.memberIDs.forEach(member => { %>
+                    <% var currentMember = users.filter(user => user.id === member.id)[0] %>
+                    <% if(currentMember.groupID === thisGroup.id){ %>
+                        <p><i><%= currentMember.firstName %> <%= currentMember.lastName %></i></p>
+                    <% } else { %>
+                        <p><i><%= currentMember.firstName %> <%= currentMember.lastName %>: invite pending..</i></p>
+                    <% } %>
+                <% }) %>
+                <%var totalScore = 0 %>
+                <% thisGroup.assignmentAnswers.forEach(answer => { %>
+                    <% if(answer.assessedByAdmin && answer.adminScore !== undefined){ %>
+                        <% totalScore += answer.adminScore %>
+                    <% } else if(answer.score !== undefined && answer.accepted) { %>
+                        <% totalScore += answer.score %>
+                    <% } else if(answer.score === undefined){ %>
+                        <% totalScore += 0 %>
+                    <% } %>
+                <% }) %>
+                <% if(thisGroup.score !== undefined){ %>
+                    <% totalScore += thisGroup.score %>
+                <% } else { %>
+                    <% totalScore += Number(0) %>
+                <% } %>
+                <% if(totalScore !== 0){ %>
+                    <p><b>Total score:</b> <i><%= String(totalScore) %></i></p>
+                <% } else { %>
+                    <p><b>Total score:</b> <i>0</i></p>
+                <% } %>
+                <div>
+                    <button onclick="window.location.href='/groups/<%=thisGroup.id%>/update'">Update group</button> <br> <br>
+                    <% if(thisGroup.assignmentAnswers.length > 0){ %>
+                        <button onclick="window.location.href='/status/<%=thisGroup.id%>'">Status</button>
+                        <% if(classes.filter(thisClass => thisClass.id === thisGroup.classID)[0].lastFinishedAssignment !== undefined){ %>
+                            <button onclick="window.location.href='/scoreboard/<%= thisGroup.classID %>'">Scoreboard</button> 
+                        <% } %>
+                        <br> <br>
+                    <% } %>
+                    <button onclick="window.location.href='/assignments'">Go to assignments</button> <br><br>
+                    <%if(thisGroup.assignmentAnswers !== [] && thisGroup.assignmentAnswers !== undefined){%>
+                        <button onclick="window.location.href='/groups/<%=thisGroup.id%>/correction'">Correct an assignment</button> <br><br>
+                    <% } %>
+
+                    <% if(classes.filter(thisClass => thisClass.id === thisGroup.classID)[0].finishedAssignments.length !== 0){ %>
+                        <button onclick="window.location.href='/scoreboard/<%= thisGroup.classID %>'">Scoreboard</button><br><br><br>
+                    <% } %>
+                </div>
+        <% } %>
+
+
+        
+        <button onclick="window.location.href='/logout'">Click me to log out</button> <br> <br> <br>
+
+    </div>
+    
+
+<% include partials/footer %>

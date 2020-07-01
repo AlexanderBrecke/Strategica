@@ -1,0 +1,30 @@
+<% include partials/header %>
+
+<h1>Create a group</h1>
+
+<form action="/groups/<%=group.id%>?_method=PUT" method="POST">
+    
+    <div>
+            <h3>Update members</h3>
+            <% users.forEach(user => { %>
+                <% if(user !== thisUser && user.groupID === undefined && !user.isAdmin) { %>
+                    <% var groupMembers = [] %>
+                    <% group.memberIDs.forEach(member => { %>
+                        <% groupMembers.push(member.id) %>
+                    <% }) %>
+                    <p><%= user.firstName + ' ' + user.lastName %></p>
+                    <% if(groupMembers.includes(user.id)) { %>
+                        <input type="checkbox" name="invite" value="<%=user.id%>" checked="checked">
+                    <%} else {%>
+                        <input type="checkbox" name="invite" value="<%= user.id %>" > 
+                    <%}%>
+                <% } %>
+            <% }) %>
+
+    </div>
+    <button>Update group</button>
+</form> <br> <br>
+
+    
+    <button onclick="window.location.href='/users/<%=thisUser.id%>'">Click me to go to user page</button>
+<% include partials/footer %>

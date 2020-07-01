@@ -1,0 +1,25 @@
+<% include partials/header %>
+
+
+
+<div class="container">
+
+    <h1>Create a new class</h1>
+
+    
+    
+    <form action="/classes/create" method="POST">
+    
+        <input type="text" name="className" placeholder="Class name here"><br>
+        <input type="text" name="classPassword" placeholder="Class password here"><br><br><br>
+    
+        
+        <input type="submit" value="Submit">
+    
+    </form>
+
+    <br> <button onclick="window.location.href='/users/<%= thisUser.id %>'">Click me to go back to user</button>
+
+</div>
+
+<% include partials/footer %>

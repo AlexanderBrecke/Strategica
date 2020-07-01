@@ -1,0 +1,57 @@
+<% include partials/header %>
+
+    <div class="container">
+
+        <% if(thisUser.isAdmin){ %>
+            <div class="groupInfo">
+                <% if(currentGroup.avatar.name !== "Húan Hu"){ %>
+                    <img src="/images/<%= currentGroup.avatar.name %>.png">
+                <% } else { %>
+                    <img src="/images/HuanHu.png">
+                <% } %>
+                    <p><b>Name: <%= currentGroup.avatar.name %></b></p>
+                    <p><b>Description:</b> <i><%= currentGroup.avatar.description %></i></p>
+            </div>
+
+            <p><b>Class name: </b> <i><%= classes.filter(thisClass => thisClass.id === currentGroup.classID)[0].name %> </i></p>
+
+            <ul>
+                <b>Group members:</b>
+                <% currentGroup.memberIDs.forEach(member => { %>
+                    <% var thisMember = users.filter(user => user.id === member.id)[0] %>
+                    <li>
+                        <%= thisMember.firstName %> <%= thisMember.lastName %> <%if(thisMember.groupID !== currentGroup.id){ %>
+                            invite pending..
+                        <% } %>
+                    </li>
+                <% }) %>
+            </ul>
+
+            <% if(currentGroup.assignmentAnswers.length > 0){ %>
+                <ul>
+                    <b>Answered assignments:</b>
+                    <% currentGroup.assignmentAnswers.forEach(answered => { %>
+                        <% var thisAssignment = assignments.filter(assignment => assignment.id === answered.id)[0] %>
+                        <li>
+                            <%= thisAssignment.assignmentTitle %>  <% if(answered.adminScore === undefined && answered.score !== undefined){ %>
+                                &nbsp;&nbsp; <b>Score: </b> <%= answered.score %>
+                            <% } else if(answered.adminScore !== undefined){ %>
+                                &nbsp;&nbsp; <b>Score: </b> <%= answered.adminScore %>
+                            <% } %>
+                            &nbsp;&nbsp; <button onclick="window.location.href='/admin/groups/<%= currentGroup.id %>/<%= thisAssignment.id %>'">Go to assignment</button>
+                        </li>
+                    <% }) %>
+                </ul>
+            <% } %>
+
+
+
+        <% } %>
+        <button onclick="window.location.href='/classes/<%= currentGroup.classID %>/groups'">Go back to group overview</button><br><br>
+        <button onclick="window.location.href='/logout'">Click me to log out</button> <br> <br> <br>
+
+    </div>
+
+    
+
+<% include partials/footer %>

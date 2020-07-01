@@ -1,0 +1,51 @@
+<% include partials/header %>
+
+
+<h1>Create a group</h1>
+    <form action="/groups/create" method="POST">
+        <div>
+            <h2>
+                Choose your avatar!
+            </h2>
+            <% if(thisUser.avatarsToChoose.length === 0){ %>
+                <p>Please reload to recieve avatars to choose from</p>
+            <% } else { %>
+                <% thisUser.avatarsToChoose.forEach(avatar => { %>
+                    <div class="avatar">
+                        <% if(avatar.name !== "Húan Hu"){ %>
+                            <img src="/images/<%= avatar.name %>.png">
+                            <p><b>Choose:</b> <input type="radio" name="avatar" value="<%= avatar.name %>"></p>
+                            <p><b>Name: <%= avatar.name %></b></p>
+                            <p><b>Description:</b> <i><%= avatar.description %></i></p>
+                        <% } else { %>
+                            <img src="/images/HuanHu.png">
+                            <p><b>Choose:</b> <input type="radio" name="avatar" value="<%= avatar.name %>"></p>
+                            <p><b>Name: <%= avatar.name %></b></p>
+                            <p><b>Description:</b> <i><%= avatar.description %></i></p>
+                        <% } %>
+                        <input type="checkBox" name="avatars" value="<%= avatar.name %>" checked="checked" style="display: none">
+                    </div><br><br>
+                <% }) %>
+
+            <% } %>
+            <% var studentsWithoutGroups = 0 %>
+            <% if(Number(studentsWithoutGroups) !== 0){ %>
+                <h3>Invite to group</h3>
+            <% } %>
+            <% currentClass.students.forEach(student => { %>
+                <% if(student.groupID === undefined){ %>
+                    <% studentsWithoutGroups = Number(studentsWithoutGroups) + Number(1) %>
+                <% } %>
+                <% var thisStudent = users.filter(user => user.id === student.id)[0] %>
+                <% if(thisStudent.id !== thisUser.id && thisStudent.groupID === undefined && !thisStudent.isAdmin){ %>
+                    <p><%= thisStudent.lastName + ' ' + thisStudent.firstName %></p>
+                    <input type="checkbox" name="invite" value="<%= thisStudent.id %>">
+                <% } %>
+            <% }) %>
+        </div>
+        <button>Create group</button>
+    </form> <br> <br>
+
+
+    <button onclick="window.location.href='/users/<%= thisUser.id %>'">Click me to go to user page</button>
+<% include partials/footer %>

@@ -1,0 +1,130 @@
+<% include partials/header %>
+
+<% if(!thisUser.isAdmin){ %>
+    <% thisGroup = groups.filter(group => group.id === thisUser.groupID)[0] %>
+    <% var thisGroupsAnswers = thisGroup.assignmentAnswers.filter(answer => answer.id === assignment.id)[0] %>
+    <% var currentClass = classes.filter(thisClass => thisClass.id === thisGroup.classID)[0] %>
+
+    <h2>Details for level: <%= assignment.level %></h2>
+
+
+    <% for(var i = 0; i < assignment.tasks.length; i++){ %>
+        <div class="task">
+
+            <% if(assignment.tasks[i].image !== ""){ %>
+                <img src="<%=assignment.tasks[i].image%>">
+            <% } %>
+            <p><b><%=assignment.tasks[i].title%></b></p>
+            <p><i><%=assignment.tasks[i].text%></i></p>
+            <div class="answer">
+                <p><b>Your answer:</b> <br> <i><%= thisGroupsAnswers.answers[i].answer %></i></p>
+            </div>
+            <div class="comments">
+                <p><b>Corrector's comments:</b> <br> <i><%= thisGroupsAnswers.answers[i].comment %></i></p>
+            </div>
+            <% if(thisGroupsAnswers.assessedByAdmin){ %>
+                <div class="adminComments">
+                    <p><b>Admin's comments: </b><br> <i><%= thisGroupsAnswers.answers[i].adminComment %></i></p>
+                </div>
+            <% } %>
+            <br>
+        </div>
+    <% } %>
+    <div class="assessment">
+        <p><b>Corrector's assessment:</b> <br> <i><%= thisGroupsAnswers.assessment %></i></p>
+        <% if(thisGroupsAnswers.adminScore === undefined){ %>
+            <p><b>Your score:</b> <i><%= thisGroupsAnswers.score %></i></p>
+        <% } %>
+    </div>
+
+    <% if(thisGroupsAnswers.assessedByAdmin){ %>
+        <div class="adminAssessment">
+            <% if(thisGroupsAnswers.adminAssessment !== ""){ %>
+                <p><b>Admin's assessment:</b> <br> <i><%= thisGroupsAnswers.adminAssessment %></i></p>
+            <% } %>
+            <% if(thisGroupsAnswers.adminScore !== undefined){ %>
+                <p><b>Admin's score:</b> <br> <i><%= thisGroupsAnswers.adminScore %></i></p>
+            <% } else { %>
+                <p>Admin agrees with the score given by corrector.</p>
+            <% } %>
+    
+        </div>
+    <% } %>
+    <% if(!thisGroupsAnswers.assessedByAdmin && !thisGroupsAnswers.accepted){ %>
+        <form action="/status/<%= thisGroup.id %>/details/<%= assignment.id %>?_method=PUT" method="POST" >
+            <button name="accept" value="<%= assignment.id %>">Accept</button> <br><br><br>
+            <textarea name="declineReason" cols="100" rows="10" placeholder="In case of decline, give reason here.."></textarea><br>
+            <button name="decline" value="<%= assignment.id %>">Decline</button>
+        </form>
+    <% } %>
+    <% if(currentClass.finishedAssignments.length > 0){ %>
+        <% currentClass.finishedAssignments.forEach(currentAssignment => { %>
+            <% if(currentAssignment.id === assignment.id && thisGroupsAnswers.assessedByAdmin || currentAssignment.id === assignment.id && thisGroupsAnswers.accepted){ %>
+                <button onclick="window.location.href='/assignments/<%= thisGroupsAnswers.id %>'">Edit answers</button> <br>
+
+            <% } %>
+        <% }) %>
+    <% } %>
+    
+
+    <br> <button onclick="window.location.href='/groups/<%=thisGroup.id%>'">Go to group</button>
+<% } else { %>
+
+    <h1>Details of level <%= currentAssignment.level %> for group: <%=currentGroup.avatar.name %></h1>
+    <div class="groupInfo">
+        <% if(currentGroup.avatar.name !== "Húan Hu"){ %>
+            <img src="/images/<%= currentGroup.avatar.name %>.png">
+        <% } else { %>
+            <img src="/images/HuanHu.png">
+        <% } %>
+        <p><b>Group description:</b> <i><%= currentGroup.avatar.description %></i></p>
+    </div>
+    
+    <% var thisGroupsAnswers = currentGroup.assignmentAnswers.filter(answer => answer.id === currentAssignment.id)[0] %>
+
+    <% for(var i = 0; i < currentAssignment.tasks.length; i++){ %>
+
+        <%if(currentAssignment.tasks[i].image !== ""){ %>
+            <img src="<%=tasks[i].image%>">
+        <% } %>
+        <p><b><%=currentAssignment.tasks[i].title%></b></p>
+        <p><i><%=currentAssignment.tasks[i].text%></i></p>
+        <p><b>Group's answer:</b></p>
+        <p><i><%= thisGroupsAnswers.answers[i].answer %></i></p>
+        <% if(thisGroupsAnswers.isCorrected){ %>
+            <p><b>Corrector's comments:</b></p>
+            <p><i><%= thisGroupsAnswers.answers[i].comment %></i></p>
+        <% } %>
+        <% if(thisGroupsAnswers.assessedByAdmin){ %>
+            <p><b>Admin's comments:</b></p>
+            <p><i><%= thisGroupsAnswers.answers[i].adminComment %></i></p>
+        <% } %>
+        <br>
+    <% } %>
+    <% if(thisGroupsAnswers.isCorrected){ %>
+        <p><b>Corrector's assessment:</b></p>
+        <p><i><%= thisGroupsAnswers.assessment %></i></p>
+    <% } %>
+    <% if(thisGroupsAnswers.assessedByAdmin){ %>
+        <p><b>Admin's assessment:</b></p>
+        <p><i><%= thisGroupsAnswers.adminAssessment %></i></p>
+    <% } %>
+    <br>
+    <% if(thisGroupsAnswers.adminScore !== undefined){ %>
+        <p><b>Score:</b> <i><%=thisGroupsAnswers.adminScore %></i></p>
+    <% } else if(thisGroupsAnswers.adminScore === undefined && thisGroupsAnswers.score !== undefined){ %>
+        <p><b>Score: </b> <i><%=thisGroupsAnswers.score %></i></p>
+    <% } %>
+    <br>
+    <button onclick="window.location.href='/admin/groups/<%= currentGroup.id %>/<%= currentAssignment.id %>/assess'">Assess this assignment</button><br><br>
+    <button onclick="window.location.href='/admin/groups/<%= currentGroup.id %>'">Go to group details</button>
+
+<% } %>
+
+
+
+
+    
+
+
+<% include partials/footer %>

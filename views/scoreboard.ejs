@@ -1,0 +1,57 @@
+<% include partials/header %>
+
+<div class="container">
+
+    <h1>Scoreboard!</h1>
+    <% if(currentClass.finishedAssignments !== undefined){ %>
+        <% var last = currentClass.finishedAssignments.length %>
+        <% var lastFinishedAssignment = assignments.filter(assignment => assignment.id === currentClass.finishedAssignments[Number(last)-1].id)[0] %>
+    <% } %>
+
+    <% if(currentClass.finishedAssignments !== undefined){ %>
+
+        <%console.log(groups) %>
+        <% groups.forEach(group =>{ %>
+            <% if(group.classID === currentClass.id){ %>
+                <% var lastFinishedGroupAssignment = group.assignmentAnswers.filter(answer => answer.id === lastFinishedAssignment.id)[0] %>
+                
+                <% if(group.score !== undefined){ %>
+                    
+                    <div class="groupInfo">
+                        <% if(group.avatar.name !== "Húan Hu"){ %>
+                            <img src="/images/<%= group.avatar.name %>.png">
+                        <% } else { %>
+                            <img src="/images/HuanHu.png">
+                        <% } %>
+                        <p><b>Name: <%= group.avatar.name %></b></p>
+                        <p><b>Description:</b> <i><%= group.avatar.description %></i></p>
+                    </div>
+                    <p><b>Group's score on last assignment:</b> <i>
+                        <% if(lastFinishedGroupAssignment.adminScore !== undefined){ %>
+                            <%= lastFinishedGroupAssignment.adminScore %>
+                        <% } else if(lastFinishedAssignment.adminScore === undefined && lastFinishedGroupAssignment.score !== undefined){ %>
+                            <%= lastFinishedGroupAssignment.score %>
+                        <% } else if(lastFinishedGroupAssignment.adminScore === undefined && lastFinishedGroupAssignment.score === undefined){ %>
+                            Not yet corrected..
+                        <% } %>
+                    </i></p>
+                    <% if(group.id === thisUser.groupID){ %>
+                        <button onclick="window.location.href='/scoreboard/details/<%= group.id %>'">Go to details</button><br>
+                    <% } %>
+                    <br>
+
+                <% } %>
+
+            <% } %>
+
+        <% }) %>
+
+
+    <% } %>
+
+    <button onclick="window.location.href='/groups/<%= thisUser.groupID %>'">Go back to group</button>
+
+
+</div>
+
+<% include partials/footer %>

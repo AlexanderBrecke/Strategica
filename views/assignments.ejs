@@ -1,0 +1,130 @@
+<% include partials/header %>
+
+
+<h1>Assignments</h1>
+
+<div class="container">
+
+    <% if(thisUser.id === "admin"){ %>
+        <% if(assignments !== null){ %>
+            
+
+            <% assignments.forEach(assignment => { %>
+                <div class="assignmentShowcase">
+    
+                    <div class="showcaseTitle">
+                        <p><b><%= assignment.title %></b></p>
+                        <p><i><%= assignment.details %></i></p>
+                        <p><i>Nivå: <%= assignment.level %></i></p>
+                    </div>
+    
+                    <button onclick="window.location.href='/assignments/<%=assignment.id%>/edit'">Edit</button><br>
+                    <button onclick="window.location.href='/assignments/<%=assignment.id%>'">Go to the assignment</button> <br>
+                    <form action="/assignments" method="POST">
+                        <% classes.forEach(thisClass => { %>
+                            <% if(thisClass.publishedAssignments.length !== 0){ %>
+                                <% var isPublished = [] %>
+                                <% thisClass.publishedAssignments.forEach(classAssignment => { %>
+                                    <% if(classAssignment.id === assignment.id){ %>
+                                        <% isPublished.push(assignment.id) %>
+                                    <% } %>
+                                <% }) %>
+                                <% if(isPublished.includes(assignment.id)){ %>
+                                    <input type="checkbox" name="classPublish" value="<%= thisClass.id %>" checked="checked"> <%= thisClass.name %>
+                                <% } else { %>
+                                    <input type="checkbox" name="classPublish" value="<%= thisClass.id %>"> <%= thisClass.name %>
+                                <% } %>
+                            <% } else { %>
+                                <input type="checkbox" name="classPublish" value="<%= thisClass.id %>"> <%= thisClass.name %>
+                            <% } %>
+                        <% }) %> <br>
+                        <button name="assignmentToPublish" value="<%= assignment.id %>"> Publish for selected classes </button>
+                    </form>
+                    <form action="/assignments" method="POST">
+                        <% classes.forEach(thisClass => { %>
+                            <% var isFinished = [] %>
+                            <% thisClass.finishedAssignments.forEach(finished => { %>
+                                <% if(finished.id === assignment.id){ %>
+                                    <% isFinished.push(assignment.id) %>
+                                <% } %>
+                            <% }) %>
+                            <% if(thisClass.finishedAssignments !== undefined){ %>
+                                <% if(isFinished.includes(assignment.id)){ %>
+                                    <input type="checkbox" name="classFinish" value="<%= thisClass.id %>" checked="checked"> <%= thisClass.name %>
+                                <% } else { %>
+                                    <input type="checkbox" name="classFinish" value="<%= thisClass.id %>"> <%= thisClass.name %>
+                                <% } %>
+                            <% } else { %>
+                                <input type="checkbox" name="classFinish" value="<%= thisClass.id %>"> <%= thisClass.name %>
+                            <% } %>
+                        <% }) %> <br>
+                        <button name="assignmentToFinish" value="<%= assignment.id %>"> Finish for selected classes </button>
+                    </form> <br>
+                    <form action="/assignments/<%=assignment.id%>?_method=DELETE" method="POST">
+                        <button>Delete</button>
+                    </form>
+    
+                </div><br><br>
+            <% }) %>
+        <% } %>
+
+        <button onclick="window.location.href='/assignments/create'">Create new assignment</button> <br> <br>
+        <button onclick="window.location.href='/users/<%=thisUser.id%>'">Go to user page</button>
+
+
+    <% } else { %>
+        <% var currentClass = classes.filter(thisClass => thisClass.id === thisUser.classID)[0] %>
+        <% var group = groups.filter(currentGroup => currentGroup.id === thisUser.groupID)[0] %>
+        <% var publishedAssignments = [] %>
+        <% var finishedAssignments = [] %>
+
+        <% currentClass.publishedAssignments.forEach(assignment => { %>
+            <% publishedAssignments.push(assignment.id) %>
+        <% }) %>
+        <% currentClass.finishedAssignments.forEach(assignment => { %>
+            <% finishedAssignments.push(assignment.id) %>
+        <% }) %>
+
+
+        <% for(var i = 0; i < assignments.length; i++){ %>
+
+            <% if(publishedAssignments.includes(assignments[i].id) && ! finishedAssignments.includes(assignments[i].id)){ %>
+                
+                <div class="assignment">
+                    <p><%= assignments[i].title %></p>
+                    <p><%= assignments[i].introduction %></p>
+    
+                    <% if(group.assignmentAnswers.some(answer => answer.id === assignments[i].id)){ %>
+                        <% var currentAnswer = group.assignmentAnswers.filter(answer => answer.id === assignments[i].id)[0] %>
+                        <% if(!currentAnswer.isCorrected){ %>
+                            <p><i>Waiting for correction..</i></p>
+                        <% } else if(currentAnswer.isCorrected && !currentAnswer.accepted && !currentAnswer.declined){ %>
+                            <p><i>Waiting for acception..</i></p>
+                        <% } %>
+                    <% } else { %>
+                        <button onclick="window.location.href='/assignments/<%= assignments[i].id %>'">Go to assignment</button>
+                    <% } %>
+    
+            <% } else if(publishedAssignments.includes(assignments[i].id) && finishedAssignments.includes(assignments[i].id)){ %>
+                <% var currentAnswer = group.assignmentAnswers.filter(answer => answer.id === assignments[i].id)[0] %>
+                <% if(!currentAnswer isCorrected){ %>
+                    <p><i>Waiting for correction..</i></p>
+                <% } else if(currentAnswer.isCorrected && !currentAnswer.accepted && !currentAnswer.declined){ %>
+                    <p><i>Waiting for acception..</i></p>
+                <% } %>
+                <p><%= assignments[i].title %></p>
+                <p><%= assignments[i].introduction %></p>
+                <p><i>Assignment is finished for your class..</i></p>
+            <% } %>
+                </div> <br>
+        <% } %>
+
+        
+        
+        <br> <br> <button onclick="window.location.href='/groups/<%= thisUser.groupID %>'">Go to groups page</button>
+    <% } %>
+
+
+</div>
+
+<% include partials/footer %>

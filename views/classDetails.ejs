@@ -1,0 +1,45 @@
+<% include partials/header %>
+
+    <div class="container">
+
+        <h1>Class details for <%= currentClass.name %></h1>
+
+        <% currentClass.students.forEach(student => { %>
+            <% var thisStudent = users.filter(user => user._id === student.id)[0] %>
+
+            
+            <div class="student">
+                <ul>
+                    <li>
+                        Name: <i><%= thisStudent.lastName %>, <%= thisStudent.firstName %></i>
+                    </li>
+                    <li>
+                        email: <i><%= thisStudent.email %></i>
+                    </li>
+                    <% if(thisStudent.groupID !== undefined){ %>
+                        <% var currentGroup = groups.filter(group => group.id === thisStudent.groupID)[0] %>
+                        <div class="groupInfo">
+                            <% if(currentGroup.avatar.name !== "Húan Hu"){ %>
+                                <img src="/images/<%= currentGroup.avatar.name %>.png">
+                            <% } else { %>
+                                <img src="/images/HuanHu.png">
+                            <% } %>
+                                <p><b>Name: <%= currentGroup.avatar.name %></b></p>
+                                <p><b>Description:</b> <i><%= currentGroup.avatar.description %></i></p>
+                        </div>
+                    <% } %>
+                </ul>
+
+                <button onclick="window.location.href='/users/<%= thisStudent.id %>/update'">Update student</button>
+            </div> <br>
+        <% }) %>
+
+        <br> <br> <button onclick="window.location.href='/users/<%= thisUser.id %>'">Click me to go back to user</button>
+    </div>
+
+    
+    
+
+    
+
+<% include partials/footer %>

@@ -1,0 +1,86 @@
+<% include partials/header %>
+
+    <% if(thisUser.isAdmin){ %>
+        <div class="assignment">
+                <div class="assignmentPart">
+                    <p><b>Nivå <%=assignment.level%></b></p>
+                    <p><i><%=assignment.introduction%></i></p>
+                </div> <br>
+                <div class="tasks">
+                    <% for(var i = 0; i < assignment.tasks.length; i++){ %>
+                        <div class="task">
+                            <%if(assignment.tasks[i].image !== ""){ %>
+                                <img src="<%=tasks[i].image%>">
+                            <% } %>
+                            <p><b><%=assignment.tasks[i].title%></b></p>
+                            <p><i><%=assignment.tasks[i].text%></i></p>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+    <% } else { %>
+
+        <% var group = groups.filter(group => group.id === thisUser.groupID)[0] %>
+        <% var hasAnsweredAssignment = group.assignmentAnswers.some(answer => answer.id === assignment.id) %>
+        
+        <% if(hasAnsweredAssignment){ %>
+            <% var groupsAnswer = group.assignmentAnswers.filter(currentAssignment => currentAssignment.id === assignment.id)[0] %>
+            <form action="/assignments/<%=assignment.id%>/answer/edit?_method=PUT" method="POST">
+                <div class="assignment">
+                    <div class="assignmentPart">
+                        <p><b>Nivå <%=assignment.level%></b></p>
+                        <p><i><%=assignment.introduction%></i></p>
+                    </div> <br>
+                    <div class="tasks">
+                        <% for(var i = 0; i < assignment.tasks.length; i++){ %>
+                            <div class="task">
+                                <%if(assignment.tasks[i].image !== ""){ %>
+                                    <img src="<%=tasks[i].image%>">
+                                <% } %>
+                                <p><b><%=assignment.tasks[i].title%></b></p>
+                                <p><i><%=assignment.tasks[i].text%></i></p>
+
+                                <textarea name="taskAnswer" cols="100" rows="10" placeholder="Your answer here"><%= groupsAnswer.answers[i].answer %></textarea>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+                <% if(!thisUser.isAdmin) { %>
+                    <input type="submit" value="submit">
+                <% } %>
+            </form> <br> <br>
+        <% } else { %>
+        
+            <form action="/assignments/<%=assignment.id%>/answer" method="POST">
+                <div class="assignment">
+                    <div class="assignmentPart">
+                        <p><b>Nivå <%=assignment.level%></b></p>
+                        <p><i><%=assignment.introduction%></i></p>
+                    </div> <br>
+                    <div class="tasks">
+                        <% assignment.tasks.forEach(task => { %>
+                            <div class="task">
+                                <%if(task.image !== ""){ %>
+                                    <img src="<%=task.image%>">
+                                <% } %>
+                                <p><b><%=task.title%></b></p>
+                                <p><i><%=task.text%></i></p>
+                                <textarea name="taskAnswer" cols="100" rows="10" placeholder="Your answer here"></textarea>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+                <input type="submit" value="submit">
+            </form> <br> <br>
+        <% } %>
+    <% } %>
+
+<% if(thisUser.isAdmin) { %>
+    <button onclick="window.location.href='/assignments/'">Go to assignments</button> <br> <br>
+    <button onclick="window.location.href='/users/<%=thisUser.id%>'">Go to user page</button>
+<% } else { %>
+    <button onclick="window.location.href='/groups/<%= thisUser.groupID %>'">Go to groups page</button>
+<% } %>
+
+
+<% include partials/footer %>

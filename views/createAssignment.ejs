@@ -1,0 +1,51 @@
+<% include partials/header %>
+
+<script type="text/javascript">
+
+function createTask() {
+    var tasks = document.getElementById("taskTemplate").cloneNode(true);
+    tasks.style.display = "block";
+    var whereToInsert = document.getElementById("taskSpawner");
+    whereToInsert.parentNode.insertBefore(tasks,whereToInsert);
+}
+
+window.onload = () =>{
+    document.getElementById("createTask").onclick=createTask;
+    createTask();
+}
+    
+</script>
+
+<h1>Create an assignment</h1>
+
+
+<div id="taskTemplate" style="display: none">
+    <div name="task">
+        <input type="text" name="taskTitle" placeholder="Task title here"> 
+        <input type="text" name="image" placeholder="url to image"> <br>
+    
+    
+        <textarea name="taskText" cols="75" rows="15" placeholder="Task text here"></textarea> <br>
+    
+        
+        <input type="button" value="Remove task" onclick="this.parentNode.parentNode.removeChild(this.parentNode);"> <br>
+    </div>
+
+
+</div>
+
+<form action="/assignments/create" method="POST">
+
+    <input type="text" name="assignmentLevel" placeholder="Assignment level here"> <br>
+    <input type="text" name="assignmentTitle" placeholder="Assignment title here"><br> 
+    <textarea name="assignmentIntroduction"cols="75" rows="5" placeholder="Short introduction to the assignment"></textarea> <br> <br>
+
+    <span id="taskSpawner"></span><br>
+    <input type="button" id="createTask" value="Add task">
+    <input type="submit" value="Submit">
+</form>
+
+
+
+
+<% include partials/footer %>

@@ -1,0 +1,70 @@
+<% include partials/header %>
+
+<script type="text/javascript">
+
+function createTasks() {
+    var tasks = document.getElementById("taskTemplate").cloneNode(true);
+    tasks.style.display = "block";
+    var whereToInsert = document.getElementById("taskSpawner");
+    whereToInsert.parentNode.insertBefore(tasks,whereToInsert);
+}
+
+window.onload = () =>{
+    document.getElementById("createTasks").onclick=createTasks;
+}
+    
+</script>
+
+<h1>Edit: <i>"<%=assignment.assignmentTitle%>"</i></h1>
+
+
+
+<div id="taskTemplate" style="display: none">
+    <div name="task">
+        <input type="text" name="taskTitle" id="taskTitle" placeholder="Task title here"> 
+        <input type="text" name="image" placeholder="url to image"> <br>
+    
+    
+        <textarea name="taskText" id="" cols="75" rows="15" placeholder="Task text here"></textarea> <br>
+    
+        
+        <input type="button" value="Remove task" onclick="this.parentNode.parentNode.removeChild(this.parentNode);"> <br>
+    </div>
+
+
+</div>
+
+<form action="/assignments/<%=assignment.id%>?_method=PUT" method="POST">
+
+    <p>Level: <input type="text" name="assignmentLevel" value="<%= assignment.level%>"> <br></p>
+    <p>Title: <input type="text" name="assignmentTitle" value="<%= assignment.title %>"><br> </p>
+    
+    <textarea name="assignmentIntroduction"cols="75" rows="5" placeholder="Short introduction to the assignment"><%= assignment.introduction %></textarea> <br> <br>
+
+    <% console.log(assignment) %>
+    <% assignment.tasks.forEach(task => { %>
+        <div>
+            <div name="task">
+                <input type="text" name="taskTitle" id="taskTitle" value="<%=task.title%>"> 
+                <input type="text" name="image" value="<%=task.image%>" placeholder="image Url here"> <br>
+            
+            
+                <textarea name="taskText" id="" cols="75" rows="15" placeholder="Task text here"><%=task.text%></textarea> <br>
+            
+                
+                <input type="button" value="Remove task" onclick="this.parentNode.parentNode.removeChild(this.parentNode);"> <br>
+            </div>
+        
+        
+        </div>
+    <% }) %>
+
+    <span id="taskSpawner"></span><br>
+    <input type="button" id="createTasks" value="Add task">
+    <input type="submit" value="Submit">
+</form>
+
+
+
+
+<% include partials/footer %>

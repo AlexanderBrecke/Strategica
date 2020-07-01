@@ -1,0 +1,76 @@
+<% include partials/header %>
+
+    <div class="container">
+
+        <h1>Profile</h1>
+        
+    <ul>
+        <% if(!thisUser.isAdmin){ %>
+            <li>
+                Class name: <%= classes.filter(currentClass => currentClass._id === thisUser.classID)[0].name %>
+            </li> <br>
+        <% } %>
+           
+        <li>
+            First name: <%= thisUser.firstName %> 
+        </li>
+        <li>
+            Last Name: <%= thisUser.lastName %>
+        </li>
+        <li>
+            Email: <%= thisUser.email %>
+        </li>
+        <li><a href="/users/<%= thisUser.id %>/update">Change email/password</a></li>
+    </ul>
+    <% if(thisUser.requests !== [] && thisUser.requests !== undefined) { %>
+        <form action="/users/<%=thisUser.id%>?_method=PUT" method="POST">
+            <%thisUser.requests.forEach(request => {%>
+                <% var requestingGroup = groups.filter(group => group.id === request.id)[0] %>
+                <ul>
+                    <i>message: </i><%=request.message%> <br>
+                    <div class="groupInfo">
+                        <% if(requestingGroup.avatar.name !== "Húan Hu"){ %>
+                            <img src="/images/<%= requestingGroup.avatar.name %>.png">
+                        <% } else { %>
+                            <img src="/images/HuanHu.png">
+                        <% } %>
+                        <p><b>Name: <%= requestingGroup.avatar.name %></b></p>
+                        <p><b>Description:</b> <i><%= requestingGroup.avatar.description %></i></p>
+                    </div>
+                    <% requestingGroup.memberIDs.forEach(member => { %>
+                        <% var currentMember = users.filter(user => user.id === member.id)[0] %>
+                        <% if(currentMember.id !== thisUser.id){ %>
+                            <li>
+                                <i><%= currentMember.firstName %> <%= currentMember.lastName %></i>
+                            </li>
+                        <% } %>
+                    <% }) %>
+                    <button name="join" value="<%=request.id%>">Join</button> <button name="decline" value="<%=request.id%>">Decline</button><br><br>
+                </ul>
+                    
+            <%})%>
+        </form>
+    <% } %>
+
+    <% if(!thisUser.isAdmin) { %>
+        
+        <% if(!thisUser.groupID) { %>
+            <button onclick="window.location.href='/groups/create'">Create a group</button> <br> <br>
+        <% } else { %>
+            <button onclick="window.location.href='/groups/<%= thisUser.groupID %>'">Go to groups page</button> <br> <br>
+        <% } %> 
+    <% } else{ %>
+        <button onclick="window.location.href='/classes'">Go to class overview</button><br><br>
+        <button onclick="window.location.href='/assignments'">Go to assignments</button><br><br>
+        <% if(thisUser.declinedAssignments !== undefined && thisUser.declinedAssignments.length !== 0){ %>
+            <button onclick="window.location.href='/admin/declined'">Declined assignments: <%= thisUser.declinedAssignments.length %></button> <br> <br>
+        <% } %>
+
+    <% } %>
+    
+    
+
+    <button onclick="window.location.href='/logout'">Click me to log out</button>
+    
+
+<% include partials/footer %>

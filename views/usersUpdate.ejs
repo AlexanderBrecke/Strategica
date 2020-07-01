@@ -1,0 +1,43 @@
+<% include ./partials/header %>
+
+<h1>Update email/password!</h1>
+
+
+
+<% if(!thisUser.isAdmin){ %>
+    <form action="/users/<%=thisUser.id%>?_method=PUT" method="POST">
+        <input type="email" name="email" placeholder="Old email"> <br>
+        <input type="email" name="newEmail" placeholder="New email"> <br>
+        <input type="password" name="password" placeholder="Old password"> <br>
+        <input type="password" name="newPassword" placeholder="New password"> <br>
+        <button>Update</button>
+    </form>
+<% } else { %>
+    <% if(!userToUpdate.isAdmin){ %>
+        <form action="/users/ <%= userToUpdate.id %>?_method=PUT" method="POST">
+            <input type="email" name="newEmail" placeholder="New email"> <br>
+            <input type="password" name="newPassword" placeholder="New password"> <br>
+            <% groups.forEach(group => { %>
+                <% if(group.classID === userToUpdate.classID){ %>
+                    <% if(userToUpdate.groupID !== undefined && userToUpdate.groupID === group.id){ %>
+                        <input type="radio" name="group" value="<%= group.id %>" checked="checked"> Group: <%= group.avatar.name %> <br>
+                    <% } else { %>
+                        <input type="radio" name="group" value="<%= group.id %>"> Group: <%= group.avatar.name %> <br>
+                    <% } %>
+                <% } %>
+            <% }) %>
+            <button>Update</button>
+        </form>
+    <% } else { %>
+        <form action="/users/<%= userToUpdate.id %>?_method=PUT" method="POST">
+            <input type="email" name="email" placeholder="Old email"> <br>
+            <input type="email" name="newEmail" placeholder="New email"> <br>
+            <input type="password" name="password" placeholder="Old password"> <br>
+            <input type="password" name="newPassword" placeholder="New password"> <br>
+            <button>Update</button>
+        </form>
+    <% } %>
+<% } %>
+
+
+<% include ./partials/footer %>

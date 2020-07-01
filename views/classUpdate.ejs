@@ -1,0 +1,40 @@
+<% include partials/header %>
+
+
+
+
+<div class="container">
+
+    <h1>Update <%= currentClass.name %></h1>
+
+    
+    <form action="/classes/<%= currentClass.id %>?_method=PUT" method="POST">
+        <input type="text" name="className" value="<%= currentClass.name %>"><br>
+        <input type="text" name="classPassword" value="<%= currentClass.password %>"><br><br><br>
+
+        <% currentClass.students.forEach(student => { %>
+            <% var thisStudent = users.filter(user => user.id === student.id)[0] %>
+            <% var thisStudentsGroup %>
+            <% if(thisStudent.groupID !== undefined){ %>
+                <% thisStudentsGroup = groups.filter(group => group.id === thisStudent.groupID)[0] %>
+                <p><b>Name: </b> <i><%= thisStudent.lastName %>, <%= thisStudent.firstName %> | </i> <b>Group number: </b> <i><%= thisStudentsGroup.number %></i> </p>
+            <% } else { %>
+                <p><b>Name: </b> <i><%= thisStudent.lastName %>, <%= thisStudent.firstName %> | </i> <b>Group: </b> <i>none..</i></p>
+            <% } %>
+            
+        <% }) %>
+    
+        
+        <input type="submit" value="Submit">
+    </form> <br>
+
+    
+
+    <br> <button onclick="window.location.href='/users/<%= thisUser.id %>'">Click me to go back to user</button>
+
+</div>
+
+
+
+
+<% include partials/footer %>

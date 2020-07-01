@@ -1,0 +1,53 @@
+<% include partials/header %>
+
+<div class="container">
+
+    <h1>Scoreboard details for <%= currentGroup.avatar.name %>!</h1>
+    <div class="groupInfo">
+        <% if(currentGroup.avatar.name !== "Húan Hu"){ %>
+            <img src="/images/<%= currentGroup.avatar.name %>.png">
+        <% } else { %>
+            <img src="/images/HuanHu.png">
+        <% } %>
+    </div>
+
+    <ul>
+        <b>Breakdown of score:</b>
+
+        <% var counter = Number(0) %>
+        <% currentGroup.assignmentAnswers.forEach(answer => { %>
+            <% var currentAssignment = assignments.filter(assignment => assignment.id === answer.id)[0] %>
+            <li>
+                <b><%= currentAssignment.assignmentTitle %></b>
+                <i>
+                    <% if(answer.adminScore === undefined && answer.score !== undefined){ %>
+                        <%= answer.score %>
+                        <% counter += Number(answer.score) %>
+                    <% } else if(answer.adminScore === undefined && answer.score === undefined){ %>
+                        Assignment not corrected..
+                    <% } else if(answer.adminScore !== undefined){ %>
+                        <%= answer.adminScore %>
+                        <% counter += Number(answer.adminScore) %>
+                    <% } %>
+                </i>
+            </li>
+        <% }) %>
+        <br>
+        <li>
+            <b>Score from correcting assignments:</b> <i><%= Number(currentGroup.score) %></i>
+        </li> <br>
+
+        <li>
+            <b>Total score:</b> <i><%= Number(currentGroup.score) + Number(counter) %></i>
+        </li>
+        
+
+    </ul>
+    
+
+    <button onclick="window.location.href='/groups/<%= currentGroup.id %>'">Go back to group</button>
+
+
+</div>
+
+<% include partials/footer %>

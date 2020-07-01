@@ -1,0 +1,178 @@
+<% include partials/header %>
+
+<%if(!thisUser.isAdmin){ %>
+    <% var thisGroup = groups.filter(group => group.id === thisUser.groupID)[0] %>
+
+    <% if(thisGroup.correctingAssignments.length !== 0) { %>
+
+        <% var assignment = assignments.filter(assignment => assignment.id === thisGroup.correctingAssignments[0].id)[0] %>
+        <% var groupsAnswers = groups.filter(group => group.id === thisGroup.correctingAssignments[0].groupID)[0].assignmentAnswers.filter(answer => answer.id === assignment.id)[0] %>
+        <% var groupToCorrectFor = groups.filter(group => group.id === thisGroup.correctingAssignments[0].groupID)[0] %>
+        
+        <h1>Correcting level <%= assignment.level%></h1>
+    
+        <form action="/groups/<%=thisGroup.id%>/correction" method="POST">
+            <div class="assignment">
+
+                <div class="groupInfo">
+                    <p>Group name: <%= groupToCorrectFor.avatar.name %></p>
+                </div>
+                
+                <% for(var i = 0; i < assignment.tasks.length; i++){ %>
+        
+                    <div class="task">
+                        <%if(assignment.tasks[i].image !== ""){%>
+                            <img src="<%=assignment.tasks[i].image%>">
+                        <% } %>
+                        <p><b><%=assignment.tasks[i].title%></b></p>
+                        <p><i><%=assignment.tasks[i].text%></i></p>
+                        <div class="answer">
+                            <p><b>Groups answer:</b></p>
+                            <p><i><%=groupsAnswers.answers[i].answer%></i></p>
+                        </div><br>
+                        <p>Write your comments here</p>
+                        <textarea name="answerComments" cols="75" rows="7" placeholder="Your comments go here"></textarea> <br>
+        
+                    </div><br><br>
+                    <% } %>
+                    
+                    
+                <textarea name="assessment" cols="100" rows="10" placeholder="Assessment of the entire assignmet goes here"></textarea><br><br>
+                <input type="number" name="score" placeholder="Score from 1 to 5"> <br><br>
+    
+                <input type="submit" value="submit">
+        
+                
+        
+        
+            </div>
+        </form>
+        
+    <% } else { %>
+        <p><b>There are currently no assignments available for you to correct.. Come again later</b></p>
+    <% } %>
+    <button onclick="window.location.href='/groups/<%= thisGroup.id %>'">Go back to group</button>
+
+
+<% } else { %>
+
+    <% if(declinedAssignment !== undefined){ %>
+
+        <% var thisAssignment = assignments.filter(assignment => assignment.id === declinedAssignment.id)[0] %>
+        <% var decliningGroup = groups.filter(group => group.id === declinedAssignment.groupID)[0] %>
+        <% var decliningGroupsAssignment = decliningGroup.assignmentAnswers.filter(answer => answer.id === thisAssignment.id)[0] %>
+
+        <h1>Correcting level: <%= thisAssignment.level %></h1>
+        <div class="groupInfo">
+            <% if(decliningGroup.avatar.name !== "Húan Hu"){ %>
+                <img src="/images/<%= decliningGroup.avatar.name %>.png">
+            <% } else { %>
+                <img src="/images/HuanHu.png">
+            <% } %>
+            <p><b>Name: <%= decliningGroup.avatar.name %></b></p>
+            <p><b>Description:</b> <i><%= decliningGroup.avatar.description %></i></p>
+        </div>
+
+        <form action="/admin/declined/<%= thisAssignment.id %>/<%= declinedAssignment.groupID %>?_method=PUT" method="POST">
+
+            <div class="assignment">
+                <% for(var i = 0; i < thisAssignment.tasks.length; i++){ %>
+        
+                    <div class="task">
+                        <%if(thisAssignment.tasks[i].image !== ""){%>
+                            <img src="<%=correctingAssignment.tasks[i].image%>">
+                        <% } %>
+                        <p><b><%=thisAssignment.tasks[i].title%></b></p>
+                        <p><i><%=thisAssignment.tasks[i].text%></i></p>
+                        <div class="answer">
+                            <p><b>Groups answer:</b></p>
+                            <p><i><%=decliningGroupsAssignment.answers[i].answer%></i></p>
+                        </div><br>
+                        <div class="comments">
+                            <p><b>Correcting Group's comments:</b></p>
+                            <p><i><%= decliningGroupsAssignment.answers[i].comment %></i></p>
+                        </div> <br>
+                        <p>Write your comments here</p>
+                        <textarea name="answerComments" cols="75" rows="7" placeholder="Your comments go here"></textarea> <br>
+            
+                    </div><br><br>
+                <% } %>
+                        
+                <p><b>Correcting group's assessment:</b></p>
+                <p><i><%= decliningGroupsAssignment.assessment %></i></p>
+                <br>
+                <p><b>Groups reason to decline:</b></p>
+                <p><i><%= declinedAssignment.reason %></i></p>
+
+                        
+                <textarea name="assessment" cols="100" rows="10" placeholder="Assessment of the entire assignmet goes here"></textarea><br><br>
+                <p><b>Correcting group's score:</b> <i><%= decliningGroupsAssignment.score %></i></p>
+    
+                <input type="radio" name="agreement" value="agree"> Agree with score given by corrector. <br>
+                <input type="radio" name="agreement" value="disagree">Disagree with score given by corrector.
+    
+                    
+                <input type="number" name="score" placeholder="Score from 1 to 5"> <br><br>
+        
+                <input type="submit" value="submit">
+            </div>
+    
+        </form>
+
+    <% } else if(assessingAssignment !== undefined){ %>
+        <% var thisAssignment = assignments.filter(assignment => assignment.id === assessingAssignment.id)[0] %>
+        <h1>Correcting level: <%= thisAssignment.level %></h1>
+        <div class="groupInfo">
+            <h2>Group name: <%= groups.filter(group => group.id === assessingAssignment.groupID)[0].name %></h2>
+        </div>
+
+        <form action="/admin/declined/<%= thisAssignment.id %>/<%= assessingAssignment.groupID %>?_method=PUT" method="POST">
+
+            <div class="assignment">
+                <% for(var i = 0; i < thisAssignment.tasks.length; i++){ %>
+        
+                    <div class="task">
+                        <%if(thisAssignment.tasks[i].image !== ""){%>
+                            <img src="<%=correctingAssignment.tasks[i].image%>">
+                        <% } %>
+                        <p><b><%=thisAssignment.tasks[i].title%></b></p>
+                        <p><i><%=thisAssignment.tasks[i].text%></i></p>
+                        <div class="answer">
+                            <p><b>Groups answer:</b></p>
+                            <p><i><%= assessingAssignment.answers[i].answer %></i></p>
+                        </div><br>
+                        <div class="comments">
+                            <p><b>Correcting Group's comments:</b></p>
+                            <p><i><%= assessingAssignment.answers[i].comment %></i></p>
+                        </div> <br>
+                        <p>Write your comments here</p>
+                        <textarea name="answerComments" cols="75" rows="7" placeholder="Your comments go here"></textarea> <br>
+            
+                    </div><br><br>
+                <% } %>
+                        
+                <p><b>Correcting group's assessment:</b></p>
+                <p><i><%= assessingAssignment.assessment %></i></p>
+                        
+                <textarea name="assessment" cols="100" rows="10" placeholder="Assessment of the entire assignmet goes here"></textarea><br><br>
+                <p><b>Correcting group's score:</b> <i><%= assessingAssignment.score %></i></p>
+    
+                <input type="radio" name="agreement" value="agree"> Agree with score given by corrector. <br>
+                <input type="radio" name="agreement" value="disagree">Disagree with score given by corrector.
+    
+                    
+                <input type="number" name="score" placeholder="Score from 1 to 5"> <br><br>
+        
+                <input type="submit" value="submit">
+            </div>
+    
+        </form>
+    <% } %>
+    
+
+
+    
+<% } %>
+
+
+<% include partials/footer %>
